@@ -1,3 +1,6 @@
+![RAFCON_LOGO](/source/images/RAFCON_LOGO.png "LOGO")
+
+
 This Repository is intended to showcase the usage of RAFCON state machines with ROS2.
 
 -------------------------------------------------------------------------------------------------
