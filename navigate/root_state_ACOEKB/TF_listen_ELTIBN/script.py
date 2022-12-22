@@ -8,7 +8,7 @@ ok = False
 def lookup_cb():
     global ok,tf_buffer,t
     try:
-        t = tf_buffer.lookup_transform('map','can4',rclpy.time.Time())
+        t = tf_buffer.lookup_transform('map','can5',rclpy.time.Time())
         print('Received Lookup, exiting')
         ok = 'pass'
     except:
@@ -22,7 +22,7 @@ def execute(self, inputs, outputs, gvm):
         if gvm.variable_exist("ros_node_initialized") or gvm.get_variable("ros_node_initialized"):
             tf_buffer = Buffer()
             tf_listener = TransformListener(tf_buffer, node_handle)
-            timer = node_handle.create_timer(0.1,lookup_cb)
+            timer = node_handle.create_timer(0.0001,lookup_cb)
         while not ok:
             rclpy.spin_once(node_handle)
         outputs['tf']=t
