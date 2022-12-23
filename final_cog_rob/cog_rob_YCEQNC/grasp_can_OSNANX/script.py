@@ -5,7 +5,7 @@ from tf2_ros.transform_listener import TransformListener
 from geometry_msgs.msg import Twist
 from spot_msgs.srv import SpotMotion
 ok = False
-
+global num
 class Lookup(Node):
     def __init__(self):
         super().__init__('lookup')
@@ -20,11 +20,11 @@ class Lookup(Node):
 
     def lookup_cb(self):
         global ok
+        global num
+        self.can = "can"+str(num)
         try:
-
-            print(self.x_align)
-            self.tf_buffer.wait_for_transform_async('Robotiq3fGripper','can5', rclpy.time.Time())
-            self.t = self.tf_buffer.lookup_transform('Robotiq3fGripper','can5', rclpy.time.Time())
+            self.tf_buffer.wait_for_transform_async('Robotiq3fGripper',self.can, rclpy.time.Time())
+            self.t = self.tf_buffer.lookup_transform('Robotiq3fGripper',self.can, rclpy.time.Time())
             #print('Received Lookup, exiting')
             #print(self.t)
             
@@ -34,7 +34,7 @@ class Lookup(Node):
         if self.x_align == False:
             print(self.x_align)
             if not 0.08<self.t.transform.translation.y<0.12:
-                print("aligning x")
+                print(self.t.transform.translation.y)
                 self.vel.linear.x = 0.2
                 self.pub.publish(self.vel)
             else:
@@ -43,21 +43,20 @@ class Lookup(Node):
                 self.x_align = True
 
     def close_gripper(self):     
-        global ok
-     
-        self.srv = self.create_client(SpotMotion,'/Spot/close_gripper')
-     
-
-    
+        global ok 
+        self.srv = self.create_client(SpotMotion,'/Spot/close_gripper')  
         self.req = SpotMotion.Request()
         self.future = self.srv.call_async(self.req)
         rclpy.spin_until_future_complete(self,self.future)
+        ok = True
         return
   
 
 
 def execute(self, inputs, outputs, gvm):
     global ok
+    global num
+    num  = inputs['can_num']
     try:
         rclpy.init()
     except:

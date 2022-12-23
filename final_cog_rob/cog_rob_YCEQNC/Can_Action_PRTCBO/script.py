@@ -10,12 +10,15 @@ from moveit_msgs.msg import JointConstraint
 from moveit_msgs.msg import Constraints
 from moveit_msgs.msg import PlanningOptions
 from moveit_msgs.action import MoveGroup
+from action_msgs.msg import GoalStatus
 
 from copy import deepcopy
 
 global_joint_states = None
 lookup_done = False
 get_angles = False
+var = False
+global num, angles
 
 
 class MoveGroupActionClient(Node):
@@ -26,16 +29,6 @@ class MoveGroupActionClient(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.timer = self.create_timer(0.1,self.lookup_cb)
-
-        self.create_subscription(JointState, '/joint_states', self.joint_states_cb, 1)
-
-
-    def joint_states_cb(self, joint_state):
-        global global_joint_states
-        global_joint_states = joint_state
-        self.joint_state = joint_state
-
-    def send_goal(self):
 
         self.motion_plan_request = MotionPlanRequest()
         self.motion_plan_request.workspace_parameters.header.stamp = self.get_clock().now().to_msg()
@@ -53,21 +46,7 @@ class MoveGroupActionClient(Node):
         self.jc.tolerance_below = 0.0001
         self.jc.weight = 1.0
 
-        joints = {}
-        joints['shoulder_pan_joint'] = self.angles[0]
-        joints['shoulder_lift_joint'] = self.angles[1]
-        joints['elbow_joint'] = self.angles[2]
-        joints['wrist_1_joint'] = self.angles[3]
-        joints['wrist_2_joint'] = self.angles[4]
-        joints['wrist_3_joint'] = self.angles[5]
-
-        constraints = Constraints()
-        for (joint, angle) in joints.items():
-            self.jc.joint_name = joint
-            self.jc.position = angle
-            constraints.joint_constraints.append(deepcopy(self.jc))
-
-        self.motion_plan_request.goal_constraints.append(constraints)
+        
 
         self.motion_plan_request.pipeline_id = 'move_group'
         self.motion_plan_request.group_name = 'spot_ur3e_arm'
@@ -88,64 +67,98 @@ class MoveGroupActionClient(Node):
 
         
         self._action_client = ActionClient(self, MoveGroup, '/move_action')
+
+        self.create_subscription(JointState, '/joint_states', self.joint_states_cb, 1)
+
+
+    def joint_states_cb(self, joint_state):
+        global global_joint_states
+        global_joint_states = joint_state
+        self.joint_state = joint_state
+
+    def send_goal(self):
+        global var
+        
+        joints = {}
+        joints['shoulder_pan_joint'] = self.angles[0]
+        joints['shoulder_lift_joint'] = self.angles[1]
+        joints['elbow_joint'] = self.angles[2]
+        joints['wrist_1_joint'] = self.angles[3]
+        joints['wrist_2_joint'] = self.angles[4]
+        joints['wrist_3_joint'] = self.angles[5]
+
+        constraints = Constraints()
+        for (joint, angle) in joints.items():
+            self.jc.joint_name = joint
+            self.jc.position = angle
+            constraints.joint_constraints.append(deepcopy(self.jc))
+
+        self.motion_plan_request.goal_constraints.append(constraints)
+        
         self.motion_plan_request.start_state.joint_state = self.joint_state
 
         goal_msg = MoveGroup.Goal()
         goal_msg.request = self.motion_plan_request
         goal_msg.planning_options = self.planning_options
 
-        self._action_client.wait_for_server()
-        #print("waiting")
+        while not self._action_client.wait_for_server(timeout_sec=2.0):
+            continue
         self._send_goal_future = self._action_client.send_goal_async(goal_msg)
-        self._send_goal_future.add_done_callback(self.goal_response_callback)
-
-    def goal_response_callback(self, future):
-        goal_handle = future.result()
+        rclpy.spin_until_future_complete(self, self._send_goal_future)
+        goal_handle = self._send_goal_future.result()
         if not goal_handle.accepted:
+            self.var = False
             return
-
-        self._get_result_future = goal_handle.get_result_async()
+        self.get_result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self, self.get_result_future)
+        status = self.get_result_future.result().status
+        if status == GoalStatus.STATUS_SUCCEEDED:
+            var = True
+        return
    
 
 
     def lookup_cb(self):
         global lookup_done
+        global num
+        self.can = "can"+str(num)
         try:
-            self.tf_buffer.wait_for_transform_async('base_link','can5', rclpy.time.Time())
-            self.t = self.tf_buffer.lookup_transform('base_link','can5',rclpy.time.Time()) 
+            self.tf_buffer.wait_for_transform_async('base_link',self.can, rclpy.time.Time())
+            self.t = self.tf_buffer.lookup_transform('base_link',self.can, rclpy.time.Time())
             while lookup_done == False:
                 #print('Received Lookup, exiting')
                 print(self.t.transform.translation.z)
                 if -0.060<self.t.transform.translation.z<-0.050:
                     self.key = -0.055
                     self.joint_angles(self.key)
-                elif -0.050 < self.t.transform.translation.z < -0.040:
+                elif -0.050 < self.t.transform.translation.z < -0.030:
                     self.key = -0.046
                     self.joint_angles(self.key)
                 elif 0.240 < self.t.transform.translation.z < 0.250:
                     self.key = 0.248
                     self.joint_angles(self.key)
-                elif 0.250 < self.t.transform.translation.z < 0.260:
+                elif 0.250 < self.t.transform.translation.z < 0.270:
                     self.key = 0.254
                     self.joint_angles(self.key)
         except:
             print("Not getting Lookup")
 
     def joint_angles(self, key):
-        global get_angles, lookup_done
+        global get_angles, lookup_done, angles
         self.angle_val = {-0.055 : [1.1021957076032016, -0.17248525117034186, 1.7602054848751538, 4.695393383535243, 1.1017290218565028, -3.1472797573696605],
             -0.046 : [-1.0286563487178404, -2.9471373911172947, -1.7788700326189506, -1.5538880379676083, -1.0289534302696344, 3.1399130639653143],
             0.248 : [-5.1807660382063645, -0.7382727144594636, 2.0415024749905446, 1.8383681303505592, -1.1024246039727346, 0.0028362194177750464],
             0.254 : [-5.180767579168836, -0.7659777878197128, 2.0466537486542555, 1.8609218355554278, -1.1024231075469837, -6.280348911199471]}
         self.angles = self.angle_val[key]
+        angles = self.angles
         get_angles = True
-        # print(self.angles)
-        # print(get_angles)
         self.timer.destroy()
         lookup_done = True
 
 def execute(self, inputs, outputs, gvm):
     global lookup_done,get_angles
+    global num,angles
+    num  = inputs['can_num'] 
     try:
         rclpy.init()
     except:
@@ -155,10 +168,12 @@ def execute(self, inputs, outputs, gvm):
         if lookup_done and get_angles:
             rclpy.spin_once(action_client)
             action_client.send_goal()
-            rclpy.spin_once(action_client)
             break
         else:
             rclpy.spin_once(action_client)
-            #print(lookup_done)
         i += 1
-    return 0 
+    if var:
+        outputs['angles'] = angles
+        return 0
+    else:
+        return -1
