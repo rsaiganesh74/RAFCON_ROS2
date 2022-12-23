@@ -5,7 +5,7 @@
         "__jsonqualname__": "rafcon.core.state_elements.logical_port.Income"
     }, 
     "input_data_ports": {}, 
-    "name": "Save Position", 
+    "name": "compute_ik", 
     "outcomes": {
         "-2": {
             "__jsonqualname__": "rafcon.core.state_elements.logical_port.Outcome", 
@@ -32,7 +32,16 @@
             }, 
             "default_value": null, 
             "name": "joint_states"
+        }, 
+        "1": {
+            "__jsonqualname__": "rafcon.core.state_elements.data_port.OutputDataPort", 
+            "data_port_id": 1, 
+            "data_type": {
+                "__type__": "moveit_msgs.srv._get_position_ik.GetPositionIK_Response"
+            }, 
+            "default_value": null, 
+            "name": "compute_ik_response"
         }
     }, 
-    "state_id": "FQEDNA"
+    "state_id": "DXORUJ"
 }

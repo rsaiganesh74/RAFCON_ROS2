@@ -29,7 +29,7 @@ class Navigate(Node):
         goal = NavigateToPose.Goal()
         goal.pose.header.frame_id = "map"
         goal.pose.header.stamp = self.get_clock().now().to_msg()
-        goal.pose.pose.position.x = self.tf.transform.translation.x-1.14
+        goal.pose.pose.position.x = self.tf.transform.translation.x-2
         goal.pose.pose.position.y = self.tf.transform.translation.y
         goal.pose.pose.position.z = 0.0
         goal.pose.pose.orientation = self.tf.transform.rotation

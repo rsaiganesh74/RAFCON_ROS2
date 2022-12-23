@@ -4,8 +4,18 @@
     "income": {
         "__jsonqualname__": "rafcon.core.state_elements.logical_port.Income"
     }, 
-    "input_data_ports": {}, 
-    "name": "Save Position", 
+    "input_data_ports": {
+        "0": {
+            "__jsonqualname__": "rafcon.core.state_elements.data_port.InputDataPort", 
+            "data_port_id": 0, 
+            "data_type": {
+                "__type__": "sensor_msgs.msg._joint_state.JointState"
+            }, 
+            "default_value": null, 
+            "name": "joint_states"
+        }
+    }, 
+    "name": "back_to_zero", 
     "outcomes": {
         "-2": {
             "__jsonqualname__": "rafcon.core.state_elements.logical_port.Outcome", 
@@ -23,16 +33,6 @@
             "outcome_id": 0
         }
     }, 
-    "output_data_ports": {
-        "0": {
-            "__jsonqualname__": "rafcon.core.state_elements.data_port.OutputDataPort", 
-            "data_port_id": 0, 
-            "data_type": {
-                "__type__": "sensor_msgs.msg._joint_state.JointState"
-            }, 
-            "default_value": null, 
-            "name": "joint_states"
-        }
-    }, 
-    "state_id": "FQEDNA"
+    "output_data_ports": {}, 
+    "state_id": "KWNVBK"
 }

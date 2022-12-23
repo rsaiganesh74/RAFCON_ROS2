@@ -13,10 +13,10 @@ from copy import deepcopy
 
 global_joint_states = None
 var = False
-class MoveGroupActionClient(Node):
+class MoveGroupActionClient_two(Node):
 
     def __init__(self):
-        super().__init__('moveit_plan_execute_python')
+        super().__init__('moveit_plan_execute')
 
         self.motion_plan_request = MotionPlanRequest()
         self.motion_plan_request.workspace_parameters.header.stamp = self.get_clock().now().to_msg()
@@ -36,11 +36,11 @@ class MoveGroupActionClient(Node):
         jc.weight = 1.0
 
         joints = {}
-        joints['shoulder_pan_joint'] = -1.6391
-        joints['shoulder_lift_joint'] = -0.1366
-        joints['elbow_joint'] = -2.0147
-        joints['wrist_1_joint'] = -0.7512
-        joints['wrist_2_joint'] = 1.5708
+        joints['shoulder_pan_joint'] = 0.0
+        joints['shoulder_lift_joint'] = 0.0
+        joints['elbow_joint'] = 0.0
+        joints['wrist_1_joint'] = 0.0
+        joints['wrist_2_joint'] = 0.0
         joints['wrist_3_joint'] = 0.0
 
         constraints = Constraints()
@@ -67,7 +67,6 @@ class MoveGroupActionClient(Node):
         self.planning_options.replan = True
         self.planning_options.replan_attempts = 10
         self.planning_options.replan_delay = 0.1
-
         self.create_subscription(JointState, '/joint_states', self.joint_states_cb, 1)
         self._action_client = ActionClient(self, MoveGroup, '/move_action')
 
@@ -75,7 +74,7 @@ class MoveGroupActionClient(Node):
         global global_joint_states
         global_joint_states = joint_state
         self.joint_state = joint_state
-
+        
     def send_goal(self):
         global var
         self.motion_plan_request.start_state.joint_state = self.joint_state
@@ -99,18 +98,15 @@ class MoveGroupActionClient(Node):
         return
 
 def execute(self, inputs, outputs, gvm):
-    global var
+    global var,global_joint_states
     try:
         rclpy.init()
     except:
         self.logger.info(".")
-    action_client = MoveGroupActionClient()
-    # Get info from /joint_states
+    action_client_two = MoveGroupActionClient_two()
     while global_joint_states is None:
-        rclpy.spin_once(action_client)
-    self.logger.info("Received")
-    outputs['joint_states'] = action_client.joint_state
-    action_client.send_goal()
+        rclpy.spin_once(action_client_two)
+    action_client_two.send_goal()
     if var:
         return 0
     else:
