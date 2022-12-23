@@ -22,7 +22,7 @@ class Distance(Node):
             if not self.translate_y:
                 if self.t.transform.translation.y>0.0:
                     if not 0.0<self.t.transform.translation.y<0.04:
-                        self.vel.linear.y = 0.3
+                        self.vel.linear.y = 0.35
                         self.pub.publish(self.vel)
                     else:
                         self.vel.linear.y = 0.0
@@ -30,7 +30,7 @@ class Distance(Node):
                         self.translate_y = True
                 else:
                     if not 0.0<self.t.transform.translation.y<0.04:
-                        self.vel.linear.y = -0.3
+                        self.vel.linear.y = -0.35
                         self.pub.publish(self.vel)
                     else:
                         self.vel.linear.y = 0.0

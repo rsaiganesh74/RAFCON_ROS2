@@ -24,53 +24,53 @@ class Orient(Node):
             if not self.rotate_complete:
                 if num == 5:
                     if self.t.transform.rotation.z>=0:
-                        if not -0.01<self.t.transform.rotation.z<0.01:
-                            self.vel.angular.z=0.3
+                        if not -0.01<self.t.transform.rotation.z<0.02:
+                            self.vel.angular.z=0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True    
                     else:
-                        if not -0.01<self.t.transform.rotation.z<0.01:
-                            self.vel.angular.z=-0.3
+                        if not -0.01<self.t.transform.rotation.z<0.02:
+                            self.vel.angular.z=-0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True
                 elif num == 4 or num == 3:
                     if self.t.transform.rotation.z<=-0.707:
-                        if not -0.71<self.t.transform.rotation.z<-0.69:
-                            self.vel.angular.z=-0.3
+                        if not -0.72<self.t.transform.rotation.z<-0.68:
+                            self.vel.angular.z=-0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True    
                     else:
-                        if not -0.69<self.t.transform.rotation.z<-0.71:
-                            self.vel.angular.z=0.3
+                        if not -0.72<self.t.transform.rotation.z<-0.68:
+                            self.vel.angular.z=0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True
                 elif num == 1:
                     if self.t.transform.rotation.z>=1:
-                        if not 0.99<self.t.transform.rotation.z<1.01:
-                            self.vel.angular.z=-0.3
+                        if not 0.98<self.t.transform.rotation.z<1.02:
+                            self.vel.angular.z=-0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True    
                     else:
-                        if not 0.99<self.t.transform.rotation.z<1.01:
-                            self.vel.angular.z=0.3
+                        if not 0.98<self.t.transform.rotation.z<1.02:
+                            self.vel.angular.z=0.4
                             self.pub.publish(self.vel)
                         else:
-                            self.vel.angular.z = -0.0
+                            self.vel.angular.z = 0.0
                             self.pub.publish(self.vel)
                             self.rotate_complete = True
 

@@ -9,10 +9,10 @@
             "__jsonqualname__": "rafcon.core.state_elements.data_port.InputDataPort", 
             "data_port_id": 0, 
             "data_type": {
-                "__type__": "geometry_msgs.msg._transform_stamped.TransformStamped"
+                "__type__": "__builtin__.int"
             }, 
             "default_value": null, 
-            "name": "tf"
+            "name": "can_num"
         }
     }, 
     "name": "naviagte to bin", 
@@ -34,5 +34,5 @@
         }
     }, 
     "output_data_ports": {}, 
-    "state_id": "TDWFXI"
+    "state_id": "ECLNRK"
 }

@@ -7,11 +7,10 @@ from geometry_msgs.msg import TransformStamped
 from nav2_msgs.action import NavigateToPose,ComputePathToPose
 from action_msgs.msg import GoalStatus
 from geometry_msgs.msg import PoseStamped
-from spot_msgs.srv import SpotMotion
 
 enter_lookup = False
 odom_enter = False
-
+global num
 class Navigate(Node):
     def __init__(self):
         super().__init__("navigate_to_pose")
@@ -24,6 +23,7 @@ class Navigate(Node):
         self.status = "success"
 
     def navigate(self):
+        global num
         while not self.nav_client.wait_for_server(timeout_sec=2.0):
             print("\nServer still not available; waiting...")
 
@@ -31,14 +31,19 @@ class Navigate(Node):
         goal.pose.header.frame_id = "map"
         goal.pose.header.stamp = self.get_clock().now().to_msg()
         
-        goal.pose.pose.position.x = 10.459-1.14
-        goal.pose.pose.position.y = 7.780
+        goal.pose.pose.position.x = 10.459-0.845
+        if num == 5 or num == 3:
+            goal.pose.pose.position.y = 7.78
+        else:
+            goal.pose.pose.position.y = 8.55
+
         goal.pose.pose.position.z = 0.0
         goal.pose.pose.orientation.x = 0.0
         goal.pose.pose.orientation.y = 0.0
         goal.pose.pose.orientation.z = 0.0
         goal.pose.pose.orientation.w = 1.0
-    
+
+
         send_goal_future = self.nav_client.send_goal_async(goal)
         rclpy.spin_until_future_complete(self, send_goal_future)
         goal_handle = send_goal_future.result()
@@ -52,15 +57,16 @@ class Navigate(Node):
         else:
             return False
 
-def execute(self, inputs, outputs, gvm):    
+def execute(self, inputs, outputs, gvm):
+    global num
     try:
         rclpy.init()
     except:
         pass
     navigate = Navigate()
+    num = inputs['can_num']
     var = navigate.navigate()
-    if var :
-        return 0 
+    if var:
+        return 0
     else:
         return -1
-
